@@ -1,0 +1,82 @@
+---
+title: "AirForecast"
+author: "Vaibhav Vesmaker"
+date: "`r Sys.Date()`"
+output: html_document
+---
+```{r}
+# Load necessary libraries
+library(forecast) 
+library(tseries)  
+library(ggplot2)
+
+# Load the AirPassengers dataset
+data("AirPassengers")
+
+# Convert to time series object
+airpass_ts <- ts(AirPassengers, start = c(1949, 1), frequency = 12)
+
+# Plot the original time series data
+autoplot(airpass_ts) + 
+  ggtitle("AirPassengers Data (1949-1960)") + 
+  xlab("Year") + ylab("Number of Passengers") +
+  theme_minimal()
+
+
+
+
+```
+```{r}
+
+# Perform Augmented Dickey-Fuller test for stationarity
+adf_test <- adf.test(airpass_ts, alternative = "stationary")
+print(adf_test)
+
+# Apply differencing to make data stationary if needed
+diff_airpass <- diff(airpass_ts)
+adf_test_diff <- adf.test(diff_airpass, alternative = "stationary")
+print(adf_test_diff)
+```
+```{r}
+# Fit ARIMA model
+arima_model <- auto.arima(airpass_ts)
+
+# Print model summary
+summary(arima_model)
+
+# Forecast the next 24 months (2 years)
+forecast_airpass <- forecast(arima_model, h = 24)
+```
+
+
+```{r}
+
+
+# Plot the forecast
+autoplot(forecast_airpass) + 
+  ggtitle("AirPassengers Forecast for Next 2 Years") +
+  xlab("Year") + ylab("Predicted Passengers") +
+  theme_minimal()
+
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
